@@ -18,15 +18,90 @@ function Image({ src, alt, className = '', width = 1400, height = 1000 }: { src:
 
 function Navigation() {
   const [open, setOpen] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
+  const [activeId, setActiveId] = useState('garden');
+
+  useEffect(() => {
+    const onScroll = () => {
+      setScrolled(window.scrollY > 40);
+
+      const sectionIds = ['garden', 'plants', 'greens', 'services', 'gifts'];
+      const scrollPos = window.scrollY + 160;
+      for (const id of sectionIds) {
+        const el = document.getElementById(id);
+        if (el) {
+          const top = el.offsetTop;
+          const height = el.offsetHeight;
+          if (scrollPos >= top && scrollPos < top + height) {
+            setActiveId(id);
+            break;
+          }
+        }
+      }
+    };
+    window.addEventListener('scroll', onScroll, { passive: true });
+    onScroll();
+    return () => window.removeEventListener('scroll', onScroll);
+  }, []);
+
   return <>
-    <nav className="floating-nav" aria-label="Primary navigation">
-      <a className="nav-brand" href="#top" aria-label="El Amor Garden, back to top">EL AMOR<span className="brand-dot">.</span></a>
+    <nav className={`floating-nav ${scrolled ? 'is-scrolled' : 'at-top'}`} aria-label="Primary navigation">
+      <a className="nav-brand" href="#top" aria-label="El Amor Garden, back to top">
+        <span className="nav-brand-diamond" aria-hidden="true">◆</span>
+        <span>EL AMOR</span>
+        <span className="brand-dot">.</span>
+      </a>
       <span className="nav-rule" aria-hidden="true" />
-      <div className="nav-links">{nav.map(item => <a key={item.id} href={`#${item.id}`}>{item.label}</a>)}</div>
-      <Button variant="navWhatsApp" asChild className="nav-contact"><a href={whatsapp} target="_blank" rel="noopener noreferrer" aria-label="Chat on WhatsApp"><MessageCircle size={14} aria-hidden="true" /><span>WhatsApp</span></a></Button>
-      <Button variant="navIcon" size="icon" className="mobile-nav-toggle" aria-label={open ? 'Close navigation' : 'Open navigation'} aria-expanded={open} onClick={() => setOpen(!open)}>{open ? <X size={18} /> : <Menu size={18} />}</Button>
+      <div className="nav-links">
+        {nav.map(item => (
+          <a
+            key={item.id}
+            href={`#${item.id}`}
+            className={activeId === item.id ? 'is-active' : ''}
+            onClick={() => setActiveId(item.id)}
+          >
+            {item.label}
+          </a>
+        ))}
+      </div>
+      <Button variant="navWhatsApp" asChild className="nav-contact">
+        <a href={whatsapp} target="_blank" rel="noopener noreferrer" aria-label="Chat on WhatsApp">
+          <MessageCircle size={14} aria-hidden="true" />
+          <span>WhatsApp</span>
+        </a>
+      </Button>
+      <Button
+        variant="navIcon"
+        size="icon"
+        className="mobile-nav-toggle"
+        aria-label={open ? 'Close navigation' : 'Open navigation'}
+        aria-expanded={open}
+        onClick={() => setOpen(!open)}
+      >
+        {open ? <X size={18} /> : <Menu size={18} />}
+      </Button>
     </nav>
-    {open && <div className="mobile-menu">{nav.map(item => <a key={item.id} href={`#${item.id}`} onClick={() => setOpen(false)}>{item.label}<ArrowUpRight size={16} /></a>)}<a href="#visit" onClick={() => setOpen(false)}>Visit the garden<ArrowUpRight size={16} /></a></div>}
+    {open && (
+      <div className={`mobile-menu ${scrolled ? 'is-scrolled' : 'at-top'}`}>
+        {nav.map(item => (
+          <a
+            key={item.id}
+            href={`#${item.id}`}
+            onClick={() => {
+              setActiveId(item.id);
+              setOpen(false);
+            }}
+          >
+            {item.label}
+            <ArrowUpRight size={16} />
+          </a>
+        ))}
+        <a href="#visit" onClick={() => setOpen(false)}>
+          Visit the garden
+          <ArrowUpRight size={16} />
+        </a>
+      </div>
+    )}
   </>;
 }
 
@@ -74,7 +149,7 @@ function ProductWorlds() {
   return <section id="worlds" className="worlds section-shell" aria-labelledby="worlds-heading">
     <Eyebrow number="02 / DISCOVER">FOUR WAYS INTO EL AMOR</Eyebrow>
     <div className="section-title-row"><h2 id="worlds-heading">Find your way <em>in.</em></h2><p>Move through the things we grow, make and imagine.</p></div>
-    <div className="worlds-layout"><div className="world-list">{worlds.map((world, index) => <a key={world.number} href={`#${world.anchor}`} className={`world-row ${active === index ? 'is-active' : ''}`} onMouseEnter={() => setActive(index)} onFocus={() => setActive(index)} onTouchStart={() => setActive(index)}><span className="world-number">{world.number}</span><span className="world-text"><strong>{world.name}</strong><small>{world.line}</small></span><ArrowUpRight size={20} strokeWidth={1.5} aria-hidden="true" /></a>)}</div><div className="world-visual" aria-live="polite">{worlds.map((world, index) => <Image key={world.number} src={world.image} alt={world.name} className={active === index ? 'is-active' : ''} />)}<span className="world-visual-label">EL AMOR / {worlds[active].number}</span></div></div>
+    <div className="worlds-layout"><div className="world-list">{worlds.map((world, index) => <a key={world.number} href={`#${world.anchor}`} className={`world-row ${active === index ? 'is-active' : ''}`} onMouseEnter={() => setActive(index)} onFocus={() => setActive(index)} onTouchStart={() => setActive(index)}><span className="world-number">{world.number}</span><span className="world-text"><strong>{world.name}</strong><small>{world.line}</small></span><ArrowUpRight size={20} strokeWidth={1.5} aria-hidden="true" /></a>)}</div><div className="world-visual" aria-live="polite">{worlds.map((world, index) => <Image key={world.number} src={world.image} alt={world.name} className={active === index ? 'is-active' : ''} />)}<span className="world-visual-label">EL AMOR / {worlds[active]?.number ?? '01'}</span></div></div>
   </section>;
 }
 
