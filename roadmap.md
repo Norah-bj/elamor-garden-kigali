@@ -1,0 +1,3 @@
+- [x] Establish editorial design system, image direction, and verified content.
+- [x] Build the continuous garden journey and interactions.
+- [ ] Verify desktop and mobile visuals, links, and motion.

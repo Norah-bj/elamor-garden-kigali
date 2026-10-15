@@ -1,0 +1,3 @@
+- Keep the El Amor experience as a single editorial journey at `/` with in-page chapter navigation, because the requested journey is continuous and scroll-led.
+- Keep verified business offerings in `src/data/garden.ts` and visual chapters in `src/components/garden/`, because content and presentation should remain distinct.
+- Load the botanical WebGL image treatment only when its chapter approaches view, because the first visit should prioritize fast imagery and readable content.
